@@ -1,0 +1,41 @@
+a, a:visited { 
+	outline: none 
+}
+img {
+	border: none;
+}
+
+#dock {
+	width: 100%;
+	position: relative;
+	left: 0px;
+}
+.dock-container {
+	position: relative;
+	height: 50px;
+	padding-left: 20px;
+}
+a.dock-item {
+	display: block; 
+	font: bold 12px Arial, Helvetica, sans-serif;
+	width: 50px; 
+	color: #000; 
+	bottom: 0px; 
+	position: absolute;
+	text-align: center;
+	text-decoration: none;
+}
+
+.dock-item:hover { cursor:pointer; }
+
+.dock-item span {
+	display: none;
+	padding-left: 20px;
+	color: #336;
+	background-color: #FFF;
+}
+.dock-item img {
+	border: none; 
+	margin: 5px 10px 0px; 
+	width: 100%; 
+}

@@ -1,0 +1,227 @@
+/* andreas00 - an open source xhtml/css website layout by Andreas Viklund  - http://andreasviklund.com/ . Free to use for any purpose as long as the proper credits are given to the original author.
+Version: 2.0 (Jan 29, 2007) */
+
+body {background-color: #eaeaea; color:#3a3a3a; font:76% Verdana,Tahoma,Arial,sans-serif; margin:0 auto; padding:0;}
+
+/* Main layout and header */
+#header {background-color: #fff; color:#505050; height:250px; margin:0 0 10px; padding:0;}
+#header h1 {font-size:2.5em; font-weight:400; letter-spacing:-2px; margin:0 0 4px 15px; padding:15px 0 0;}
+#header h1 a,#header h1 a:hover {font-weight:400; padding:0;}
+#header p {font-size:1.1em; letter-spacing:-1px; margin:0 0 20px 15px; padding:0 0 0 3px;}
+/* Main content variations */
+#content {line-height:1.5em; margin:0px 150px 20px 220px; padding:0; text-align:left;}
+#contentwide {line-height:1.5em; margin:0px 0 20px 0px; padding:0; text-align:left;}
+#content h2,#contentwide h2 {font-size:1.8em; font-weight:400; letter-spacing:-1px; margin:8px 0 10px; padding:0; color: #006666;}
+#content h3,#contentwide h3 {font-size:1.5em; font-weight:400; margin:6px 0; padding:0;}
+#content img,#contentwide img {background:none; border:0; display:inline; padding:1px;}
+#content ul,#content ol,#contentwide ul,#contentwide ol {margin:0 0 16px 20px; padding:0;}
+#content ul ul,#content ol ol,#contentwide ul ul,#contentwide ol ol {margin:2px 0 2px 20px;}
+#content li,#contentwide li {margin:0 0 2px 10px; padding:0 0 0 4px;}
+
+#leftside {clear:left; float:left; margin:0 0 10px; padding:0; width:200px;}
+#leftside .announce {background:url(../img/menubg.gif) repeat-x bottom left #f4f4f4; border-bottom:1px solid #d8d8d8; border-left:4px solid #ccc; border-right:1px solid #d8d8d8; border-top:1px solid #d8d8d8; clear:left; color:#505050; line-height:1.3em; margin:10px 0; padding:5px 5px 5px; width:160px;}
+#leftside p,.announce p {font-size:0.9em;}
+#leftside li:hover{ cursor: pointer;}
+
+#rightside {clear:right; float:right; margin:0 0 10px; padding:0; width:200px;}
+#rightside .announce {background:url(../img/menubg.gif) repeat-x bottom right #f4f4f4; border-bottom:1px solid #d8d8d8; border-left:4px solid #ccc; border-right:1px solid #d8d8d8; border-top:1px solid #d8d8d8; clear:right; color:#505050; line-height:1.3em; margin:10px 0; padding:5px 5px 5px; width:160px;}
+#rightside p,.announce p {font-size:0.9em;}
+#rightside li:hover{ cursor: pointer;}
+
+/* Footer */
+#footer {background:#fff; border-top:2px solid #dadada; clear:both; color:gray; font-size:0.9em; margin:0 auto; padding:8px 0; text-align:center; width:760px;}
+#footer p {margin:0; padding:0;}
+#footer a {background:inherit; color:gray; font-weight:400; text-decoration:none;}
+#footer a:hover {text-decoration:underline;}
+
+/* Links and paragraphs */
+a {background:inherit; color:#333366; text-decoration:none; font-weight:700;}
+a:hover {background:inherit; color:#666699; text-decoration:underline;}
+a img {border:0;}
+p {margin:0 0 16px;}
+blockquote {background:url(../images/menubg.gif) repeat-x bottom left #f4f4f4; border-bottom:1px solid #d8d8d8; border-left:4px solid #ccc; border-right:1px solid #d8d8d8; border-top:1px solid #d8d8d8; color:#505050; margin:16px; padding:7px 7px 7px 11px;}
+blockquote p {font-size:1.1em; line-height:1.3em; margin:0;}
+
+
+.announce h2 {margin:0 0 10px; padding:0;}
+/* Tabla simple */
+.simple table {background-color: #FFF; border: none; margin:0 0 16px; padding:0;}
+.simple td {background: #FFF; background-color: #FFF; color:#303030; font-size:0.9em; padding:7px;}
+
+.tabla_menu table {background: none; background-color:transparent; border-collapse: none; border: none; margin:0 0 0 0; padding:0;}
+.tabla_menu td { background: none; background-color:transparent; border: 0; color:#303030; font-size:0.9em; padding:2px;}
+
+.simple2 table {background-color: #FFF; border: none; line-height:0.0em; border-collapse: none; margin:0 0 0 0; padding:0;}
+.simple2 td {background: #FFF; background-color: #FFF; color:#303030; padding:0px;}
+
+.eventos table {background: none; background-color:transparent; border-collapse: none; border:0; margin:0; padding:0;}
+.eventos td { background: none; background-color:transparent; border: 1; color:none; font-size:0.9em; padding:2px;color:#333366; text-decoration:none; font-weight:700;}
+.eventos td:hover{background-color: #EEE; border:2px solid #CCC; cursor:pointer; color:#222255;}
+
+.tabla_foro table {background: none; background-color:#FFF; border-collapse: none; border:0; margin:0; padding:0;}
+.tabla_foro tr {border-top: 1px solid #000;}
+.tabla_foro td { background: none; background-color:#FFF; border: 1; color:none; font-size:0.9em; padding:7px;color:#333366; text-decoration:none; font-weight:700;}
+.tabla_foro td:hover{background-color: #EEE; border:2px solid #CCC; cursor:pointer; color:#222255;}
+
+.formulario table {border:1px solid #d8d8d8; border-collapse:collapse; line-height:1.3em; width:90%; margin:auto; padding:0;}
+
+/* Tables and forms */
+table {border:1px solid #d8d8d8; border-collapse:collapse; line-height:1.3em; width:95%; margin:0 0 16px; padding:0;}
+caption {font-size:1.5em; font-weight:400; margin:0; padding:6px 0 8px; text-align:left;}
+th {color:#505050; padding:7px; text-align:left;}
+td {color:#303030; font-size:0.9em; padding:7px; text-align:left;}
+
+/* Search box */
+#searchbox label,.hide {display:none;}
+#searchbox {margin:6px 0 16px; padding:0;}
+#searchform {background:#fff; border:1px solid #ccc; color:#505050; font-size:0.9em; padding:4px; width:116px;}
+
+/* Various classes */
+.announce h2 {margin:0 0 10px; padding:0;}
+.textright {margin:-10px 0 4px; text-align:right;}
+.center {text-align:center;}
+.small {font-size:0.8em;}
+.large {font-size:1.3em;}
+.highlighted {background:#f0f0f0; border:1px solid #b0b0b0; color:#303030; padding:3px;}
+.submit {border:2px solid #c7c7c7; color:#505050; font-weight:700; margin:0 0 15px; padding:7px 7px 7px 11px; width:120px;}
+.submit:hover{cursor:pointer; background-color: #98C6C1;}
+.right {float:right; margin:10px 0 5px 10px;}
+
+.menu{cursor:pointer; width:360px; height:30px; margin: 5px auto; padding:10; outline: none; border: 1px solid #336699; background: #CCCCCC; text-align: center; color: #002455; font-size:16px; font-weight: bold;}
+.menu:hover, .menu:focus{cursor: pointer; background-color: #EEEEEE;}
+.menu img {float:left; margin: 5px auto auto 20px;}
+
+.menu_off{cursor:pointer; width:360px; height:30px; margin: 5px auto; padding:10; outline: none; border: 1px solid #336699; background: #888; text-align: center; color: #002455; font-size:16px; font-weight: bold;}
+.menu_off:hover, .menu:focus{cursor: pointer; background-color: #888;}
+.menu_off img {float:left; margin: 5px auto auto 20px;}
+
+/* Pestañas de navegación */
+#tabs {
+      float:left;
+      width:98%;
+      margin: 0px auto auto 10px;
+      background:#FFFFFF;
+      font-size:93%;
+      line-height:normal;
+	    border-bottom:1px solid #24618E;
+}
+#tabs ul {
+    	margin:0;
+    	padding:10px 10px 0 50px;
+    	list-style:none;
+}
+#tabs li {
+      display:inline;
+      margin:0;
+      padding:0;
+}
+#tabs a {
+      float:left;
+      background:url("../images/tableft.gif") no-repeat left top;
+      margin:0;
+      padding:0 0 0 5px;
+      text-decoration:none;
+}
+#tabs a span {
+      float:left;
+      display:block;
+      background:url("../images/tabright.gif") no-repeat right top;
+      padding:5px 15px 4px 6px;
+      color:#24618E;
+}
+    /* Commented Backslash Hack hides rule from IE5-Mac \*/
+#tabs a span {float:none;}
+    /* End IE5-Mac hack */
+#tabs a:hover span {
+      color:#FFF;
+}
+#tabs a:hover {
+      background-position:0% -42px;
+      cursor: pointer;
+}
+#tabs a:hover span {
+      background-position:100% -42px;
+}
+
+.MarcoTab {
+      background-color:#F4F4F4; 
+      margin: 38px auto 20px 10px; 
+      width: 98%; 
+      border: 1px solid #24618E;
+}
+
+/* FORMULARIOS */
+#marginForm fieldset.radio
+{
+	margin: 0 0 0 -1em;
+	border: 0 solid #FFFFFF;
+}
+
+#marginForm fieldset.radio input
+{
+	position: static;
+	clear: both;
+	float: left;
+}
+
+#marginForm fieldset.radio label
+{
+	position: relative;
+	top: -1.25em;
+	display: inline;
+	width: auto;
+	margin: 0 0 0 16em;
+	font-weight: bold;
+	font-weight: normal;
+}
+
+#marginForm fieldset.radio legend
+{
+	float: left;
+	font-weight: bold;
+}
+
+#marginForm input
+{
+	position: relative;
+	top: -1.4em;
+	left: 16em;
+	display: block;
+}
+
+#marginForm input.submit
+{
+	clear: both;
+	top: 0;
+}
+
+#marginForm label
+{
+	clear: both;
+	float: left;
+	display: block;
+	width: 12em;
+	margin-top: -1em;
+	font-weight: bold;
+}
+
+#marginForm label.first
+{
+	margin-top: 1em;
+}
+
+#marginForm select
+{
+	position: relative;
+	top: -1.4em;
+	left: 16em;
+	display: block;
+}
+
+#marginForm textarea
+{
+	position: relative;
+	top: -1.4em;
+	left: 16em;
+	display: block;
+}
