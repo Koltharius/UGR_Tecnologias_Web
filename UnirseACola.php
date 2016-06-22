@@ -1,4 +1,7 @@
-<?php session_start(); ?>
+<?php
+require './ConexionBD.php';
+session_start();
+?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es" >
@@ -15,24 +18,16 @@
         <link rel="icon" href="decsai.ico" type="image/vnd.microsoft.icon" />
         <link rel="stylesheet" id="css-style" type="text/css" href="css/style-gestionTurnos.css" media="all" />
         <link href="css/style_dock.css" rel="stylesheet" type="text/css" />
-        <script type="text/javascript" src="js/funciones.js"></script>
+        <script type="text/javascript" src="js/ejercicio.js"></script>
+
+        <!--Guardamos en la BD los datos introducidos por el usuario en el formulario-->
+
         <?php
         $codigoRevision = $_SESSION['codigo'];
         $email = $nombre = $apellidos = $dni = "";
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $servername = "localhost";
-            $username = "root";
-            $password = "root";
-            $dbname = "gestor_turnos";
-            // Create connection
-            $conn = new mysqli($servername, $username, $password, $dbname);
-            // Check connection
-            if ($conn->connect_error) {
-                die("Connection failed: " . $conn->connect_error);
-            }
-
             $sql1 = "SELECT * FROM `alumno` where codigo_revision='$codigoRevision'";
-            $resultado = mysqli_query($conn, $sql1);
+            $resultado = mysqli_query(conexion(), $sql1);
             $numeroUsuarios = $resultado->num_rows;
             $numeroUsuarios+=1;
             $email = $_POST['email'];
@@ -41,26 +36,24 @@
             $apellido2 = $_POST['apellido2'];
             $apellidos = $apellido1 . " " . $apellido2;
             $dni = $_POST['dni'];
-            $caracteres = $nombre . $email;
-            $longpalabra = 8;
-
-            for ($codigoAlumno = '', $n = strlen($caracteres) - 1; strlen($codigoAlumno) < $longpalabra;) {
-                $x = rand(0, $n);
-                $codigoAlumno.= $caracteres[$x];
-            }
-
-
-
+                        
+            //Generacion del codigo de alumno cogiendo las tres primeras letras del nombre y las 4 ultimas del dni y las 3 primeras del cod de revision
+            $codigoAlumno = substr($nombre, 0, 3) . substr($dni, 5, 4) . substr($codigoRevision, 0, 3);
+            
 
             $sql = "INSERT INTO alumno (DNI, Email, Nombre, Apellidos, Codigo_Alumno, Codigo_Revision, Posicion)
                                     VALUES ('$dni','$email','$nombre', '$apellidos','$codigoAlumno' ,'$codigoRevision','$numeroUsuarios' )";
 
-            if ($conn->query($sql) === TRUE) {
+            if (conexion()->query($sql) === TRUE) {
                 ?>
+
+                <!--Se muestra por pantalla al usuario el código de alumno que se ha generado al unirse-->
+                <!--Este código debe guardarlo por que lo necesitará para hacer login y ver su posicion-->
+                <!--En el caso en el que el usuario ya se haya unido con anterioridad a dicha cola se le indicara-->
 
                 <script>
                     alert("Tu c\u00f3digo asociado a la cola es: <?php echo $codigoAlumno ?> \n El usuario se ha añadido correctamente a esta revisión")
-                    window.location.href="index.php";
+                    window.location.href = "index.php";
                 </script>
                 <?php
             } else {
@@ -70,7 +63,11 @@
                 </script>
                 <?php
             }
-            $conn->close();
+            ?>
+
+            <!--Cierre de la conexión con la BD-->
+            <?php
+            conexion()->close();
         }
         ?>
     </head>
@@ -89,19 +86,25 @@
 
                 <div>
                     <div id="general">
+
+                        <!--Menu Lateral-->
+
                         <div id="menus">
                             <div id="enlaces_secciones" class="mod-menu_secciones">
                                 <ul>
-                                    <li class="tipo2 item-first_level"><a href="index.php">Inicio</a></li>  
+                                    <li class="tipo2 item-first_level"><a href="index.php">Inicio</a></li>
                                     <li class="selected tipo2-selected item-first_level"><a href="UnirseACola.php">Unirse a Cola</a></li>
-                                    <li class="tipo2 item-first_level"><a href="Posicion.php">Ver Posici&oacute;n</a></li>
+                                    <li class="tipo2 item-first_level"><a href="PosicionCola.php">Ver Posici&oacute;n</a></li>
                                 </ul>
                             </div>
                         </div>
                         <div id="pagina">
+
+                            <!--formulario para unirse a la cola-->
+
                             <h1 id="titulo_pagina"><span class="texto_titulo">Unirse a cola</span></h1>
                             <div style="text-align:center">
-                                <form id="identif" style="text-align:center" method="post" onsubmit="return validateAltaProfesor()" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>"  >
+                                <form id="identif" style="text-align:center" method="post" onsubmit="return validarDatosRellenos()" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>"  >
                                     <table style="width:100%; margin:1px;" align="center" cellpadding="4" cellspacing="4"  >
                                         <tbody><tr> 
                                                 <td><div style="font-size: 18px; color:  #243349;" align="center"><b>Introducir datos del alumno</b></div></td>

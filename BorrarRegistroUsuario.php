@@ -1,19 +1,13 @@
 <?php
 session_start();
+require './ConexionBD.php';
+
+//Se borra la cola de la BD el usuario con todos los recursos que esten relacionados a el
+
 if ($_POST) {
-    $servername = "localhost";
-    $username = "root";
-    $password = "root";
-    $dbname = "gestor_turnos";
-    // Create connection
-    $con = mysqli_connect($servername, $username, $password, $dbname);
-    // Check connection
-    if (!$con) {
-        die("Connection failed: " . mysqli_error($con));
-    }
     $sql = "DELETE FROM `usuarios` where Email='$_POST[email]'";
 
-    if ($con->query($sql) === TRUE) {
+    if (conexion()->query($sql) === TRUE) {
         ?>
         <script>
             alert("El registro se ha borrado correctamente");
@@ -31,7 +25,7 @@ if ($_POST) {
 
     }
 }
-mysqli_close($con);
+mysqli_close(conexion());
 ?>
 
 

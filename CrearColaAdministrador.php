@@ -1,21 +1,24 @@
 <?php
-	session_start();
-        //echo $_SESSION['username']=$_SESSION['email']; 
-        
-	if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == true  && $_SESSION['Rol'] === "administrador") {
-	} else {
-	   echo "<script>alert('Esta página es solo para administradores'); window.location.href='index.php';</script>";
-	exit;
-	}
-	
-	$now = time();
-	 
-	if($now > $_SESSION['expire']) {
-	session_destroy();
-	echo "<script>alert('Su sesion ha terminado'); window.location.href='index.php';</script>";
-	exit;
-	}
-	?>
+session_start();
+require './ConexionBD.php';
+
+//Compruebo que el usuario esta logueado y que su sesion no ha expirado y que su rol es de administrador
+if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == true && $_SESSION['Rol'] === "administrador") {
+    
+} else {
+    echo "<script>alert('Esta página es solo para administradores'); window.location.href='index.php';</script>";
+    exit;
+}
+
+$now = time();
+
+if ($now > $_SESSION['expire']) {
+    session_destroy();
+    echo "<script>alert('Su sesion ha terminado'); window.location.href='index.php';</script>";
+    exit;
+}
+?>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es" >
     <head>
@@ -31,7 +34,7 @@
         <link rel="icon" href="decsai.ico" type="image/vnd.microsoft.icon" />
         <link rel="stylesheet" id="css-style" type="text/css" href="css/style-gestionTurnos.css" media="all" />
         <link href="css/style_dock.css" rel="stylesheet" type="text/css" />
-        <script type="text/javascript" src="js/funciones.js"></script>
+        <script type="text/javascript" src="js/ejercicio.js"></script>
         <script>
 
         </script> 
@@ -49,17 +52,21 @@
                     </div>
                 </div>
                 <div style="width: 100%; text-align: right; margin: 0px auto 0px auto;">
-      <table align="center" style="width:100%; border:none; border-collapse: none; background-color:none; background: none;" class="tabla_menu">
-        <tbody>
-          <tr>
-            <td width="75%" align="left">
-            
-                <td style="text-align: right;"><b>Usuario:</b> <?php  echo $_SESSION['nombre'] ?><br><img width="10px" height="10px" src="img/cerrar.png" alt="Cerrar Sesión">&nbsp;<a href="CerrarSesion.php">Cerrar Sesión</a><br>
-	      	    </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+                    <table align="center" style="width:100%; border:none; border-collapse: none; background-color:none; background: none;" class="tabla_menu">
+                        <tbody>
+                            <tr>
+                                <td width="75%" align="left">
+
+                                    <td style="text-align: right;">
+                                        <b>Usuario:</b> <?php echo $_SESSION['nombre'] ?><br/>
+                                        <img width="10px" height="10px" src="img/cerrar.png" alt="Cerrar Sesión">&nbsp;</img>
+                                        <a href="CerrarSesion.php">Cerrar Sesión</a><br/>
+                                    </td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 <div>
                     <div id="general">
                         <div id="menus">
@@ -82,40 +89,30 @@
                         <div id="pagina">
                             <h1 id="titulo_pagina"><span class="texto_titulo">Crear revisión</span></h1>
                             <div style="text-align:center">
-                                <?php
-                                $servername = "localhost";
-                                $username = "root";
-                                $password = "root";
-                                $dbname = "gestor_turnos";
-                                // Create connection
-                                $con = new mysqli($servername, $username, $password, $dbname);
-                                // Check connection
-                                if ($con->connect_error) {
-                                    die("Connection failed: " . $con->connect_error);
-                                }
-                                $email = $nombre = $apellidos = $dni = "";
 
+                                <!--Cogemos los datos introducidos para la creacion de la cola y los insertamos
+                                en la base de datos asociada a un profesor que le indiquemos.
+                                Se muestra un mensaje si se realiza correctamente 
+                                o un mensaje de error en el caso de que no se pueda realizar la insercion-->
+                                <?php
+                                $email = $nombre = $apellidos = $dni = "";
                                 if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     $lugar = (isset($_POST['lugarDeRevision'])) ? $_POST['lugarDeRevision'] : " ";
                                     $asignatura = $_POST['asignatura'];
                                     $fecha = $_POST['fechaRevision'];
                                     $hora = $_POST['horaRevision'];
                                     $profesor = $_POST['profesor'];
-
-                                    $caracteres = $asignatura . $profesor;
-                                    $longpalabra = 8;
-                                    for ($pass = '', $n = strlen($caracteres) - 1; strlen($pass) < $longpalabra;) {
-                                        $x = rand(0, $n);
-                                        $pass.= $caracteres[$x];
-                                    }
+                                    $anio = date('Y');
+                                    $codigo_asignatura = substr($asignatura, 0,4) . substr($anio, 2, 2) . '-' . rand(1, 3);
+                                    
                                     $sql = "INSERT INTO revisiones (codigo_revision, Asignatura, Fecha, Hora, Lugar,  Profesor) 
-                                            VALUES ('$pass', '$asignatura', '$fecha','$hora', '$lugar', '$profesor')";
+                                            VALUES ('$codigo_asignatura', '$asignatura', '$fecha','$hora', '$lugar', '$profesor')";
 
-                                    if ($con->query($sql) === TRUE) {
+                                    if (conexion()->query($sql) === TRUE) {
                                         ?>
 
                                         <script>
-                                            alert("El usuario se ha creado correctamente");
+                                            alert("La cola se ha creado correctamente");
                                             window.location = "GestionColasAdministrador.php";
                                         </script>
                                         <?php
@@ -133,6 +130,9 @@
                                     }
                                 }
                                 ?>
+                                
+                                <!--Formulario en el que el Administrador introducirá los datos de la cola.-->
+                                
                                 <form id="identif" style="text-align:center"   onsubmit="return validateFormCrearColas()" method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                                     <table style="width:100%; margin:1px;" align="center" cellpadding="4" cellspacing="4">
                                         <tbody><tr> 
@@ -162,16 +162,15 @@
                                                                 <td style="text-align: right;"> Profesor: </td>
                                                                 <td>
                                                                     <form  method="post">
-                                                                        <select name="profesor" style="width:100px;" onchange="this.style.width=200">
+                                                                        <select name="profesor" style="width:100px;" onchange="this.style.width = 200">
                                                                             <option value="0"></option>
                                                                             <?php
-                                                                            $profesor="profesor";
+                                                                            $profesor = "profesor";
                                                                             $sql = "SELECT * FROM `usuarios` where Rol='$profesor'";
-                                                                            $result1 = mysqli_query($con, $sql);
+                                                                            $result1 = mysqli_query(conexion(), $sql);
 
                                                                             if ($result1->num_rows > 0) {
                                                                                 while ($row1 = mysqli_fetch_array($result1)) {
-                                                                                    
                                                                                     ?>
                                                                                     <option value="<?php echo $row1['Email'] ?>"><?php echo $row1['Nombre'] ?></option>
                                                                                     <?php
@@ -197,7 +196,7 @@
                             </div>
                         </div>
                     </div>
-                                <div id="interior_pie">
+                    <div id="interior_pie">
                         <div id="pie">
                         </div>
                     </div>
@@ -205,5 +204,8 @@
             </div>
         </div>
     </body>
-    <?php mysqli_close($con); ?>
+    <?php
+    // Cerramos la conexion con la BD
+    mysqli_close(conexion());
+    ?>
 </html>

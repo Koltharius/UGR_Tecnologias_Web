@@ -1,20 +1,7 @@
 <?php
 
 session_start();
-?>
-
-<?php
-
-$servername = "localhost";
-$username = "root";
-$password = "root";
-$dbname = "gestor_turnos";
-// Create connection
-$con = mysqli_connect($servername, $username, $password, $dbname);
-// Check connection
-if (!$con) {
-    die("Connection failed: " . mysqli_error($con));
-}
+require './ConexionBD.php';
 
 $user = $_POST['user'];
 $passwd = md5($_POST['passwd']);
@@ -23,11 +10,11 @@ $passwd = md5($_POST['passwd']);
 $sql = "SELECT * FROM usuarios WHERE Email='$user'";
 
 //Envio la consulta a MySQL.
-$resultado = $con->query($sql);
+$resultado = conexion()->query($sql);
 
 if ($resultado->num_rows === 1) {
     $row = $resultado->fetch_array(MYSQLI_ASSOC);
-    
+
     $_SESSION['Rol'] = $row['Rol'];
 
     $profesor = "profesor";
@@ -43,10 +30,12 @@ if ($resultado->num_rows === 1) {
         } else if ($_SESSION['Rol'] === $administrador) {
             echo '<script>window.location.href="PaginaAdministrador.php";</script>';
         }
+    } else {
+        echo '<script>alert("Password incorrecto");window.location.href="index.php"</script>';
     }
 } else {
     echo "<script>alert('Error en la identificación.');window.location.href='index.php';</script>";
 }
 
-mysqli_close($con);
+mysqli_close(conexion());
 ?>

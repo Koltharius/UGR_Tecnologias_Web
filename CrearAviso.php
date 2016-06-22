@@ -1,9 +1,12 @@
 <?php
 session_start();
+require './ConexionBD.php';
+
+//Compruebo que el usuario esta logueado y que su sesion no ha expirado y que su rol es de administrador
 if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == true && ($_SESSION['Rol'] === "administrador" || $_SESSION['Rol'] === "profesor")) {
     
 } else {
-    echo "<script>alert('Esta página es solo para administradores'); window.location.href='index.php';</script>";
+    echo "<script>alert('No tiene permiso para acceder aqui'); window.location.href='index.php';</script>";
     exit;
 }
 
@@ -30,13 +33,11 @@ if ($now > $_SESSION['expire']) {
         <link rel="icon" href="decsai.ico" type="image/vnd.microsoft.icon" />
         <link rel="stylesheet" id="css-style" type="text/css" href="css/style-gestionTurnos.css" media="all" />
         <link href="css/style_dock.css" rel="stylesheet" type="text/css" />
-        <script type="text/javascript" src="js/funciones.js"></script>
+        <script type="text/javascript" src="js/ejercicio.js"></script>
 
     </head>
 
     <body>
-        <a href="BorrarProfesorAdministrador.php?email=0"  target="_self" id="enlace_borrar" style="display:none"></a>
-        <a href="ModificarProfesorAdministrador.php?email=0"  target="_self" id="enlace_modificar" style="display:none"></a>
         <div id="contenedor_margenes" class="">
             <div id="contenedor" class="">
                 <div id="cabecera" class="">
@@ -48,148 +49,197 @@ if ($now > $_SESSION['expire']) {
                         <span class="separador_enlaces"> | </span>
                     </div>
                 </div>
-                                <div style="width: 100%; text-align: right; margin: 0px auto 0px auto;">
+                <div style="width: 100%; text-align: right; margin: 0px auto 0px auto;">
                     <table align="center" style="width:100%; border:none; border-collapse: none; background-color:none; background: none;" class="tabla_menu">
                         <tbody>
                             <tr>
                                 <td width="75%" align="left">
-
-                                    <td style="text-align: right;"><b>Usuario:</b> <?php echo $_SESSION['nombre'] ?><br><img width="10px" height="10px" src="img/cerrar.png" alt="Cerrar Sesión">&nbsp;<a href="CerrarSesion.php">Cerrar Sesión</a><br>
-                                                    </td>
-                                                    </tr>
-                                                    </tbody>
-                                                    </table>
-                                                    </div>
+                                    <td style="text-align: right;">
+                                        <b>Usuario:</b> <?php echo $_SESSION['nombre'] ?><br/>
+                                        <img width="10px" height="10px" src="img/cerrar.png" alt="Cerrar Sesión">&nbsp;</img>
+                                        <a href="CerrarSesion.php">Cerrar Sesión</a><br/>
+                                    </td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 <div>
                     <div id="general">
+
+                        <!--Menus Lateral-->
+
                         <div id="menus">
                             <div id="enlaces_secciones" class="mod-menu_secciones">
                                 <ul>
                                     <li class="tipo2 item-first_level">
-                                        <?php if($_SESSION['Rol']==='administrador'){?>
-                                        <a href="PaginaAdministrador.php">Inicio</a>
-                                        <?php } else if($_SESSION['Rol']==='profesor'){?>
-                                        <a href="PaginaProfesor.php">Inicio</a>
+                                        <?php if ($_SESSION['Rol'] === 'administrador') { ?>
+                                            <a href="PaginaAdministrador.php">Inicio</a>
+                                        <?php } else if ($_SESSION['Rol'] === 'profesor') { ?>
+                                            <a href="PaginaProfesor.php">Inicio</a>
                                         <?php } ?>
                                     </li>
                                     <li class="tipo2 item-first_level">
-                                        <?php if($_SESSION['Rol']==='administrador'){?>
-                                        <a href="GestionUsuarioAdministrador.php">Gesti&oacute;n de usuarios</a>
-                                        <?php } else if($_SESSION['Rol']==='profesor'){?>
-                                        <a href="GestionUsuarioProfesor.php">Gestionar mi usuario</a>
+                                        <?php if ($_SESSION['Rol'] === 'administrador') { ?>
+                                            <a href="GestionUsuarioAdministrador.php">Gesti&oacute;n de usuarios</a>
+                                        <?php } else if ($_SESSION['Rol'] === 'profesor') { ?>
+                                            <a href="GestionUsuarioProfesor.php">Gestionar mi usuario</a>
                                         <?php } ?>
                                     </li>
                                     <li class="tipo2 item-first_level">
-                                    <?php if($_SESSION['Rol']==='administrador'){?>
-                                        <a href="GestionColasAdministrador.php">Gesti&oacute;n de colas</a>
-                                        <?php } else if($_SESSION['Rol']==='profesor'){?>
-                                        <a href="GestionColasProfesor.php">Gestionar mis colas</a>
+                                        <?php if ($_SESSION['Rol'] === 'administrador') { ?>
+                                            <a href="GestionColasAdministrador.php">Gesti&oacute;n de colas</a>
+                                        <?php } else if ($_SESSION['Rol'] === 'profesor') { ?>
+                                            <a href="GestionColasProfesor.php">Gestionar mis colas</a>
                                         <?php } ?>
                                     </li>
-                                    <?php if($_SESSION['Rol']==='profesor'){ ?>
-                                        <li class="tipo2 item-first_level"><a href="GestionTurnos.php">Gesti&oacute;n de Turnos</a></li>
-                                    <?php }?>
                                     <li class=" selected tipo2-selected item-first_level"><a href="CrearAviso.php">Crear aviso</a></li>
                                     <li class="tipo2 item-first_level"><a href="CerrarSesion.php">Cerrar Sesi&oacute;n</a></li>
                                 </ul>
                             </div>
                         </div>
+
+
                         <div id="pagina">
                             <h1 id="titulo_pagina"><span class="texto_titulo">Crear aviso</span></h1>
                             <div style="text-align:center">
+
+                                <!--Se recogen los datos del mensaje que se 
+                                desea añadir y se incluye en la BD. Se muestra un mensaje al usuario
+                                en caso de que haya exito y en caso de que haya algun problema-->
+
                                 <?php
-                                $servername = "localhost";
-                                $username = "root";
-                                $password = "root";
-                                $dbname = "gestor_turnos";
-                                // Create connection
-                                $con = new mysqli($servername, $username, $password, $dbname);
-                                // Check connection
-                                if ($con->connect_error) {
-                                    die("Connection failed: " . $con->connect_error);
-                                }
                                 $email = $nombre = $apellidos = $dni = "";
 
                                 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                                    $profesor = $_SESSION['Email'];
-                                    $fecha = $_POST['fecha'];
-                                    $mensaje = $_POST['mensaje'];
-                                    $sql = "INSERT INTO mensajes (Profesor, Fecha, Mensaje) 
-                                            VALUES ('$profesor', '$fecha','$mensaje')";
+                                    echo $profesor = $_POST['profesor'] . " ";
+                                    echo $fecha = $_POST['fecha'] . " ";
+                                    echo $hora = $_POST['hora'] . " ";
+                                    echo $mensaje = $_POST['mensaje'] . " ";
+                                    $sql = "INSERT INTO mensajes (Profesor, Fecha, Hora, Mensaje) 
+                                            VALUES ('$profesor', '$fecha', '$hora', '$mensaje')";
 
-                                    if ($con->query($sql) === TRUE) {
-                                        ?>
-
-                                        <script>
-                                            alert("El aviso se ha creado correctamente");
-                                            window.location = "GestionColasAdministrador.php";
-                                        </script>
-                                        <?php
+                                    if (conexion()->query($sql) === TRUE) {
+                                        if ($_SESSION['Rol'] === 'administrador') {
+                                            ?>
+                                            <script>
+                                                alert("El aviso se ha creado correctamente");
+                                                window.location = "PaginaAdministrador.php";
+                                            </script>
+                                            <?php
+                                        } else if ($_SESSION['Rol'] === 'profesor') {
+                                            ?>
+                                            <script>
+                                                alert("El aviso se ha creado correctamente");
+                                                window.location = "PaginaProfesor.php";
+                                            </script>
+                                            <?php
+                                        }
                                     } else {
-                                        ?>
-                                        <script>
-                                            alert("Los datos introducidos son erronesos:\n"
-                                                    + "\tEl formato de la fecha es: YYYY-MM-DD HH-MM-SS\n"
-                                                    + "\tEl campo profesor no puede estar vacio\n");
-                                            window.location = "GestionColasAdministrador.php";
-                                        </script>
-                                        <?php
+                                        if ($_SESSION['Rol'] === 'administrador') {
+                                            ?>
+                                            <script>
+                                                alert("Los datos introducidos son erronesos:\n"
+                                                        + "\tEl formato de la fecha es: YYYY-MM-DD\n"
+                                                        + "\tEl formato de la hora es: HH:MM:SS\n"
+                                                        + "\tEl campo profesor no puede estar vacio\n");
+                                                window.location = "CrearAviso.php";
+                                            </script>
+                                            <?php
+                                        } else if ($_SESSION['Rol'] === 'profesor') {
+                                            ?>
+                                            <script>
+                                                alert("Los datos introducidos son erronesos:\n"
+                                                        + "\tEl formato de la fecha es: YYYY-MM-DD\n"
+                                                        + "\tEl formato de la hora es: HH-MM-SS\n");
+                                                window.location = "CrearAviso.php";
+                                            </script>
+                                            <?php
+                                        }
                                     }
                                 }
                                 ?>
-                                <form id="identif" style="text-align:center" method="post" onsubmit="return validateAltaProfesor()" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>"  >
+                                <form id="identif" style="text-align:center" method="post" onsubmit="return validarMensajes()" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>"  >
                                     <table style="width:100%; margin:1px;" align="center" cellpadding="4" cellspacing="4"  >
-                                        <tbody><tr> 
-                                                <td><div style="font-size: 18px; color:  #243349;" align="center"><b>Crear aviso</b></div></td>
+                                        <tbody>
+                                            <tr> 
+                                                <td>
+                                                    <div style="font-size: 18px; color:  #243349;" align="center">
+                                                        <b>Crear aviso</b>
+                                                    </div>
+                                                </td>
                                             </tr>
                                             <tr align="center"> 
                                                 <td> 
                                                     <table class="formulario-datos"  cellpadding="9" cellspacing="6" align="center" >
                                                         <tbody>
                                                             <tr>
-                                                                
-                                                                    <?php
-                                                                    if ($_SESSION['Rol'] === "administrador") {
-                                                                    ?>
-                                                                <td style="text-align: right;"> Nombre: </td>
-                                                                <td>
-                                                                        <form  method="post" >
-                                                                        <select name="profesor" style="width:100px;" onchange="this.style.width=200">
-                                                                            <option value="0" ></option>
-                                                                            <?php
-                                                                            echo $op=$_SESSION['Rol']; 
-                                                                            
-                                                                            $profesor = "profesor";
-                                                                            $sql = "SELECT * FROM `usuarios`";
-                                                                            $result1 = mysqli_query($con, $sql);
 
-                                                                            if ($result1->num_rows > 0) {
-                                                                                while ($row1 = mysqli_fetch_array($result1)) {
-                                                                                    ?>
-                                                                                    <option  value="<?php echo $row1['Email'] ?>"><?php echo $row1['Nombre'] ?></option>
-                                                                                    <?php
+                                                                <?php
+                                                                if ($_SESSION['Rol'] === "administrador") {
+                                                                    ?>
+                                                                    <td style="text-align: right;"> Nombre: </td>
+                                                                    <td>
+                                                                        <form  method="post" >
+                                                                            <select name="profesor" style="width:100px;" onchange="this.style.width = 200">
+                                                                                <option value="0" ></option>
+                                                                                <?php
+                                                                                echo $op = $_SESSION['Rol'];
+
+                                                                                $profesor = "profesor";
+                                                                                $sql1 = "SELECT * FROM `usuarios`";
+                                                                                $result1 = mysqli_query(conexion(), $sql1);
+
+                                                                                if ($result1->num_rows > 0) {
+                                                                                    while ($row1 = mysqli_fetch_array($result1)) {
+                                                                                        ?>
+                                                                                        <option  name="profesor" value="<?php echo $row1['Email'] ?>"><?php echo $row1['Nombre'] ?></option>
+                                                                                        <?php
+                                                                                    }
                                                                                 }
-                                                                            }
-                                                                            
-                                                                            ?>
-                                                                        </select>
-                                                                    </form>
+                                                                                ?>
+                                                                            </select>
+                                                                        </form>
                                                                         <?php
-                                                                        }else{ $b=$_SESSION['nombre'];?>
+                                                                    } else if ($_SESSION['Rol'] === "profesor") {
+                                                                        ?>
                                                                         <td style="text-align: right;"> Nombre: </td>
-                                                                        <td> <input type="text" name="profesor" value="<?php echo  $b   ?>" /><br/></td>
-                                                                    <?php
-                                                                    }?>
-                                                                </td>
+                                                                        <td>
+                                                                            <form  method="post" >
+                                                                                <select name="profesor" style="width:100px;" onchange="this.style.width = 200">
+                                                                                    <?php
+                                                                                    $profesor = $_SESSION['nombre'];
+                                                                                    $sql2 = "SELECT * FROM `usuarios` WHERE `Nombre`='$profesor'";
+                                                                                    $result2 = mysqli_query(conexion(), $sql2);
+
+                                                                                    if ($result2->num_rows > 0) {
+                                                                                        while ($row2 = mysqli_fetch_array($result2)) {
+                                                                                            ?>
+                                                                                            <option  value="<?php echo $row2['Email'] ?>"><?php echo $row2['Nombre'] ?></option>
+                                                                                            <?php
+                                                                                        }
+                                                                                    }
+                                                                                    ?>
+                                                                                </select>
+                                                                            </form>
+                                                                        <?php
+                                                                        }
+                                                                        // Se cierra la conexion con la BD
+                                                                        mysqli_close(conexion());
+                                                                        ?>
+                                                                    </td>
                                                             </tr>
                                                             <tr>
                                                                 <td style="text-align: right;"> Fecha de expiraci&oacute;n: </td>
-                                                                <td> <input type="text" name="fecha" /><br></td>
+                                                                <td> <input type="date" name="fecha" /><br></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="text-align: right;"> Hora de expiraci&oacute;n: </td>
+                                                                <td> <input type="text" name="hora" /><br></td>
                                                             </tr>
                                                             <tr>
                                                                 <td style="text-align: right;"> Aviso: </td>
-                                                                <td><textarea name="mensaje" rows="5" cols="40" maxlength="250"></textarea>  <br></td>
-
+                                                                <td><textarea name="mensaje" rows="5" cols="40" maxlength="250"></textarea> <br></td>
                                                             </tr>
                                                             <tr>
                                                                 <td></td>
@@ -197,7 +247,7 @@ if ($now > $_SESSION['expire']) {
                                                             </tr>
 
                                                             <tr> 
-                                                                <td colspan="2" style="text-align:center;"><input name="enviar" value="Registrar" class="submit" type="submit"></td>
+                                                                <td colspan="2" style="text-align:center;"><input name="enviar" value="Crear" class="submit" type="submit"></input></td>
                                                             </tr>
                                                         </tbody></table> 
                                                 </td>

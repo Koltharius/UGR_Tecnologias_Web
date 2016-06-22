@@ -1,6 +1,8 @@
 <?php
 session_start();
+require './ConexionBD.php';
 
+//Compruebo que el usuario esta logueado y que su sesion no ha expirado y que su rol es de administrador
 if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == true && $_SESSION['Rol'] === 'profesor') {
     
 } else {
@@ -16,6 +18,7 @@ if ($now > $_SESSION['expire']) {
     exit;
 }
 ?>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es" >
     <head>
@@ -44,32 +47,41 @@ if ($now > $_SESSION['expire']) {
                         <span class="separador_enlaces"> | </span>
                     </div>
                 </div>
-                                                <div style="width: 100%; text-align: right; margin: 0px auto 0px auto;">
+                <div style="width: 100%; text-align: right; margin: 0px auto 0px auto;">
                     <table align="center" style="width:100%; border:none; border-collapse: none; background-color:none; background: none;" class="tabla_menu">
                         <tbody>
                             <tr>
                                 <td width="75%" align="left">
-
-                                    <td style="text-align: right;"><b>Usuario:</b> <?php echo $_SESSION['nombre'] ?><br><img width="10px" height="10px" src="img/cerrar.png" alt="Cerrar Sesión">&nbsp;<a href="CerrarSesion.php">Cerrar Sesión</a><br>
-                                                    </td>
-                                                    </tr>
-                                                    </tbody>
-                                                    </table>
-                                                    </div>
+                                    <td style="text-align: right;">
+                                        <b>Usuario:</b> <?php echo $_SESSION['nombre'] ?><br/>
+                                        <img width="10px" height="10px" src="img/cerrar.png" alt="Cerrar Sesión">&nbsp;</img>
+                                        <a href="CerrarSesion.php">Cerrar Sesión</a>
+                                        <br/>
+                                    </td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 <div>
                     <div id="general">
+                        
+                        <!--Menu Lateral-->
+                        
                         <div id="menus">
                             <div id="enlaces_secciones" class="mod-menu_secciones">
                                 <ul>
                                     <li class="selected tipo2-selected item-first_level"><a href="PaginaProfesor.php">Inicio</a></li>
                                     <li class="tipo2 item-first_level"><a href="GestionUsuarioProfesor.php">Gestionar mi usuario</a></li>
                                     <li class="tipo2 item-first_level"><a href="GestionColasProfesor.php">Gestionar mis colas</a></li>
-                                    <li class="tipo2 item-first_level"><a href="GestionTurnos.php">Gesti&oacute;n de Turnos</a></li>
                                     <li class="tipo2 item-first_level"><a href="CrearAviso.php">Crear aviso</a></li>
                                     <li class="tipo2 item-first_level"><a href="CerrarSesion.php">Cerrar Sesi&oacute;n</a></li>
                                 </ul>
                             </div>
                         </div>
+                        
+                        <!--Pagina inicial del Administrador-->
+                        
                         <div id="pagina">
                             <h1 id="titulo_pagina"><span class="texto_titulo">Perfil de Profesor</span></h1>
                             <div style="text-align:center">
@@ -79,9 +91,6 @@ if ($now > $_SESSION['expire']) {
                             </div>
                         </div>
                     </div>
-                    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
-                    <script type="text/javascript">_uacct = "UA-2290740-1";urchinTracker();</script>
-
                     <div id="interior_pie">
                         <div id="pie">
                         </div>

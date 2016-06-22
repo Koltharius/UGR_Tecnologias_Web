@@ -1,7 +1,8 @@
 <?php
 session_start();
-//echo $_SESSION['username']=$_SESSION['email']; 
+require './ConexionBD.php';
 
+//Compruebo que el usuario esta logueado y que su sesion no ha expirado y que su rol es de administrador
 if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == true && $_SESSION['Rol'] === "administrador") {
     
 } else {
@@ -17,6 +18,7 @@ if ($now > $_SESSION['expire']) {
     exit;
 }
 ?>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es" >
     <head>
@@ -32,11 +34,14 @@ if ($now > $_SESSION['expire']) {
         <link rel="icon" href="decsai.ico" type="image/vnd.microsoft.icon" />
         <link rel="stylesheet" id="css-style" type="text/css" href="css/style-gestionTurnos.css" media="all" />
         <link href="css/style_dock.css" rel="stylesheet" type="text/css" />
-        <script type="text/javascript" src="js/funciones.js"></script>
+        <script type="text/javascript" src="js/ejercicio.js"></script>
     </head>
     <body>
+
+        <!--Redirección de los botones--> 
         <a href="BorrarColaAdministrador.php?codigo=0"  target="_self" id="enlace_borrar" style="display:none"></a>
         <a href="ModificarColaAdministrador.php?codigo=0"  target="_self" id="enlace_modificar" style="display:none"></a>
+
         <div id="contenedor_margenes" class="">
             <div id="contenedor" class="">
                 <div id="cabecera" class="">
@@ -53,133 +58,140 @@ if ($now > $_SESSION['expire']) {
                         <tbody>
                             <tr>
                                 <td width="75%" align="left">
+                                    <td style="text-align: right;">
+                                        <b>Usuario:</b> <?php echo $_SESSION['nombre'] ?><br/>
+                                        <img width="10px" height="10px" src="img/cerrar.png" alt="Cerrar Sesión">&nbsp;</img>
+                                        <a href="CerrarSesion.php">Cerrar Sesión</a><br/>
+                                    </td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <div id="general">
 
-                                    <td style="text-align: right;"><b>Usuario:</b> <?php echo $_SESSION['nombre'] ?><br><img width="10px" height="10px" src="img/cerrar.png" alt="Cerrar Sesión">&nbsp;<a href="CerrarSesion.php">Cerrar Sesión</a><br>
-                                                    </td>
+                        <!--Menu Lateral-->
+
+                        <div id="menus">
+                            <div id="enlaces_secciones" class="mod-menu_secciones">
+                                <ul>
+                                    <li class="tipo2 item-first_level"><a href="PaginaAdministrador.php">Inicio</a></li>  
+                                    <li class="tipo2 item-first_level"><a href="GestionUsuarioAdministrador.php">Gestión de usuarios</a></li>
+                                    <li class="selected tipo2-selected item-first_level"><a href="GestionColasAdministrador.php">Gestión de colas</a></li>
+                                    <ul>
+                                        <li class="tipo1 item-second_level first-child"><a href="CrearColaAdministrador.php">Crear cola</a></li>
+                                        <li class="tipo1 item-second_level" onclick="cogerDatos('ModificarColaAdministrador.php?codigo=', 'enlace_modificar1')">
+                                            <a href="ModificarColaAdministrador.php?codigo=0" id="enlace_modificar1">Modificar cola</a></li>
+                                        <li class="tipo1 item-second_level" onclick="cogerDatos('BorrarColaAdministrador.php?codigo=', 'enlace_borrar1')">
+                                            <a href="BorrarColaAdministrador.php?codigo=0" id="enlace_borrar1">Borrar cola</a></li>
+                                    </ul>
+                                    <li class="tipo2 item-first_level"><a href="CrearAviso.php">Crear aviso</a></li>
+                                    <li class="tipo2 item-first_level"><a href="CerrarSesion.php">Cerrar Sesi&oacute;n</a></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!--En esta pagina el Administrador podrá seleccionar 
+                        cualquiera de las colas existentes en el sistema 
+                        para borrarla o modificarla. Para ello deberá de pinchar
+                        sobre alguna de las colas que aparecen en la tabla y se 
+                        activarán dos botones que corresponderan uno a cada una de las
+                        funciones citadas. También podrá seleccionar si desea añadir una
+                        cola nueva al sistema para algun profesor.-->
+
+                        <div id="pagina">
+                            <h1 id="titulo_pagina"><span class="texto_titulo">Gestión de usuarios</span></h1>
+                            <div id="contenido" class="sec_interior">
+                                <div class="content_doku" style="text-align:center">
+                                    <?php
+                                    //Con esta consulta se sacan todas las colas del sistema
+                                    //y se presentan en una tabla con sus datos ordenados por fecha.
+                                    $sql = "SELECT * FROM `revisiones` order by `Fecha`";
+
+                                    $result = mysqli_query(conexion(), $sql);
+
+                                    if ($result->num_rows > 0) {
+                                        ?>
+                                        <form method="post" onsubmit="return cogerDatos()" action="BorrarColaAdministrador.php">
+                                            <table class="sec_interior " style="width: 99%">
+                                                <tbody>          
+                                                    <tr>
+                                                        <th class="leftalign">Código revisión</th>    
+                                                        <th class="leftalign">Asignatura</th>            
+                                                        <th class="leftalign">Fecha</th>
+                                                        <th class="leftalign">Hora</th>
+                                                        <th class="leftalign">Lugar</th>
+                                                        <th class="leftalign">Profesor</th> 
+
+                                                        <?php
+                                                        while ($row = mysqli_fetch_array($result)) {
+                                                            $email = $row['Profesor'];
+                                                            $nombre = "SELECT Nombre FROM `usuarios` where Email='$email'";
+                                                            $resultado = mysqli_query(conexion(), $nombre);
+                                                            $row1 = mysqli_fetch_array($resultado)
+                                                            ?>
+
+                                                        </tr>
+                                                        <tr id="<?php echo $row['codigo_revision'] ?> " onclick="obtenerID(id); habilitarBotones();">
+                                                            <td> <?php echo $row['codigo_revision'] ?> </td>
+                                                            <td> <?php echo $row['Asignatura'] ?> </td>
+                                                            <td> <?php echo $row['Fecha'] ?> </td>
+                                                            <td> <?php echo $row['Hora'] ?> </td>
+                                                            <td> <?php echo $row['Lugar'] ?> </td>
+                                                            <td> <?php echo $row1['Nombre'] ?> </td>
+                                                            <?php
+                                                        }
+                                                        ?>
                                                     </tr>
-                                                    </tbody>
-                                                    </table>
-                                                    </div>
-                                                    <div>
-                                                        <div id="general">
-                                                            <div id="menus">
-                                                                <div id="enlaces_secciones" class="mod-menu_secciones">
-                                                                    <ul>
-                                                                        <li class="tipo2 item-first_level"><a href="PaginaAdministrador.php">Inicio</a></li>  
-                                                                        <li class="tipo2 item-first_level"><a href="GestionUsuarioAdministrador.php">Gestión de usuarios</a></li>
-                                                                        <li class="selected tipo2-selected item-first_level"><a href="GestionColasAdministrador.php">Gestión de colas</a></li>
-                                                                        <ul>
-                                                                            <li class="tipo1 item-second_level first-child"><a href="CrearColaAdministrador.php">Crear cola</a></li>
-                                                                            <li class="tipo1 item-second_level" onclick="cogerDatos('ModificarColaAdministrador.php?codigo=', 'enlace_modificar1')">
-                                                                                <a href="ModificarColaAdministrador.php?codigo=0" id="enlace_modificar1">Modificar cola</a></li>
-                                                                            <li class="tipo1 item-second_level" onclick="cogerDatos('BorrarColaAdministrador.php?codigo=', 'enlace_borrar1')">
-                                                                                <a href="BorrarColaAdministrador.php?codigo=0" id="enlace_borrar1">Borrar cola</a></li>
-                                                                        </ul>
-                                                                        <li class="tipo2 item-first_level"><a href="CrearAviso.php">Crear aviso</a></li>
-                                                                        <li class="tipo2 item-first_level"><a href="CerrarSesion.php">Cerrar Sesi&oacute;n</a></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                            <div id="pagina">
-                                                                <h1 id="titulo_pagina"><span class="texto_titulo">Gestión de usuarios</span></h1>
-                                                                <div id="contenido" class="sec_interior">
-                                                                    <div class="content_doku" style="text-align:center">
-                                                                        <?php
-                                                                        $servername = "localhost";
-                                                                        $username = "root";
-                                                                        $password = "root";
-                                                                        $dbname = "gestor_turnos";
-                                                                        // Create connection
-                                                                        $con = mysqli_connect($servername, $username, $password, $dbname);
-                                                                        // Check connection
-                                                                        if (!$con) {
-                                                                            die("Connection failed: " . mysqli_error($con));
-                                                                        } else
-                                                                            $sql = "SELECT * FROM `revisiones` order by `Fecha`";
+                                                </tbody>
+                                            </table>
+                                        </form>
+                                        <?php
+                                    } else {
+                                        ?>   
 
-                                                                        $result = mysqli_query($con, $sql);
+                                        <!--En caso de que no haya colas en el sistema la tabla se mostrará vacía-->
+                                        <table class="sec_interior " style="width: 99%">
+                                            <tbody>          
+                                                <th class="centeralign">Selección</th>
+                                                <th class="centeralign">Código revisión</th>            
+                                                <th class="leftalign">Asignatura</th>            
+                                                <th class="leftalign">Fecha</th>
+                                                <th class="leftalign">Hora</th>
+                                                <th class="leftalign">Lugar</th>   
+                                                <tr>
+                                                    <td>  </td>
+                                                    <td>  </td>
+                                                    <td> </td>
+                                                    <td> </td>
+                                                    <td> </td>
+                                                    <td> </td>
+                                                </tr>
 
-                                                                        if ($result->num_rows > 0) {
-                                                                            ?>
-                                                                            <form method="post" onsubmit="return cogerDatos()" action="BorrarColaAdministrador.php">
-                                                                                <table class="sec_interior " style="width: 99%">
-                                                                                    <tbody>          
-                                                                                        <tr>
-                                                                                            <th class="leftalign">Código revisión</th>    
-                                                                                            <th class="leftalign">Asignatura</th>            
-                                                                                            <th class="leftalign">Fecha</th>
-                                                                                            <th class="leftalign">Hora</th>
-                                                                                            <th class="leftalign">Lugar</th>
-                                                                                            <th class="leftalign">Profesor</th> 
+                                        </table>
 
-                                                                                            <?php
-                                                                                            while ($row = mysqli_fetch_array($result)) {
-                                                                                                $email = $row['Profesor'];
-                                                                                                $nombre = "SELECT Nombre FROM `usuarios` where Email='$email'";
-                                                                                                $resultado = mysqli_query($con, $nombre);
-                                                                                                $row1 = mysqli_fetch_array($resultado)
-                                                                                                ?>
-
-                                                                                            </tr>
-                                                                                            <tr id="<?php echo $row['codigo_revision'] ?> " onclick="obtenerID(id); habilitarBotones();">
-                                                                                                <td> <?php echo $row['codigo_revision'] ?> </td>
-                                                                                                <td> <?php echo $row['Asignatura'] ?> </td>
-                                                                                                <td> <?php echo $row['Fecha'] ?> </td>
-                                                                                                <td> <?php echo $row['Hora'] ?> </td>
-                                                                                                <td> <?php echo $row['Lugar'] ?> </td>
-                                                                                                <td> <?php echo $row1['Nombre'] ?> </td>
-                                                                                                <?php
-                                                                                            }
-                                                                                            ?>
-                                                                                        </tr>
-
-
-                                                                                </table>
-                                                                            </form>
-                                                                            <?php
-                                                                        } else {
-                                                                            ?>   
-
-                                                                            <table class="sec_interior " style="width: 99%">
-                                                                                <tbody>          
-                                                                                    <th class="centeralign">Selección</th>
-                                                                                    <th class="centeralign">Código revisión</th>            
-                                                                                    <th class="leftalign">Asignatura</th>            
-                                                                                    <th class="leftalign">Fecha</th>
-                                                                                    <th class="leftalign">Hora</th>
-                                                                                    <th class="leftalign">Lugar</th>   
-                                                                                    <tr>
-                                                                                        <td>  </td>
-                                                                                        <td>  </td>
-                                                                                        <td> </td>
-                                                                                        <td> </td>
-                                                                                        <td> </td>
-                                                                                        <td> </td>
-                                                                                    </tr>
-
-                                                                            </table>
-
-                                                                            <?php
-                                                                        }
-                                                                        mysqli_close($con);
-                                                                        ?>
-                                                                        </tbody>    
-                                                                        <input id="borrar" class="submit" type="button" value="Borrar" 
-                                                                               style="display: none" onclick="cogerDatos('BorrarColaAdministrador.php?codigo=', 'enlace_borrar')"> </input>
-                                                                            <input id="modificar" class="submit" type="button" value="Modificar" 
-                                                                                   onClick="cogerDatos('ModificarColaAdministrador.php?codigo=', 'enlace_modificar')" style="display: none"></input>
-
-
-                                                                                </div>
-                                                                                </div>
-                                                                                </div>
-                                                                                </div>
-                                                                                <div id="interior_pie">
-                                                                                    <div id="pie">
-                                                                                    </div>
-                                                                                </div>
-                                                                                </div>
-                                                                                </div>
-                                                                                </div>
-                                                                                </body>
-                                                                                </html>
+                                        <?php
+                                    }
+                                    //Se cierra la conexion con la base de datos
+                                    mysqli_close(conexion());
+                                    ?>
+                                        
+                                    <!--Botones que se activan cuando seleccionas una cola de la tabla.-->
+                                    <input id="borrar" class="submit" type="button" value="Borrar" 
+                                           style="display: none" onclick="cogerDatos('BorrarColaAdministrador.php?codigo=', 'enlace_borrar')"> </input>
+                                    <input id="modificar" class="submit" type="button" value="Modificar" 
+                                           onClick="cogerDatos('ModificarColaAdministrador.php?codigo=', 'enlace_modificar')" style="display: none"></input>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="interior_pie">
+                        <div id="pie">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

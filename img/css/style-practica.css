@@ -1769,7 +1769,12 @@ li.model-resaltado-02 a.banner {
 li.model-resaltado-02 a.banner:hover {
     background-image: url("../img/banners/resaltado-02_on.png");
 }
-
+legend {
+    display: block;
+    padding-left: 2px;
+    padding-right: 2px;
+    border: none;
+}
 /** Centros **/
 #centros legend{font-size: 1.3em;color:#006666;}
 #centros fieldset{border: 2px solid #CCC; margin:60px auto 10px auto; text-align:center;}

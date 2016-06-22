@@ -1,4 +1,7 @@
-<?php session_start(); ?>
+<?php
+require './ConexionBD.php';
+session_start();
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es" >
     <head>
@@ -14,7 +17,7 @@
         <link rel="icon" href="decsai.ico" type="image/vnd.microsoft.icon" />
         <link rel="stylesheet" id="css-style" type="text/css" href="css/style-gestionTurnos.css" media="all" />
         <link href="css/style_dock.css" rel="stylesheet" type="text/css" />
-        <script type="text/javascript" src="js/funciones.js"></script>
+        <script type="text/javascript" src="js/ejercicio.js"></script>
     </head>
     <body>
         <div id="contenedor_margenes" class="">
@@ -29,13 +32,24 @@
                     </div>
                 </div>
                 <div>
+
                     <div id="general">
+
                         <div id="menus">
+
+                            <!--Menu Lateral-->
+
                             <div id="enlaces_secciones" class="mod-menu_secciones">
                                 <ul>
                                     <li class="selected tipo2-selected item-first_level"><a href="index.php">Inicio</a></li>  
                                 </ul>
                             </div>
+
+                            <!--Login Para usuarios registrados (Profesores y Administradores)
+                            
+                            LA INFORMACION QUE SE LE SOLICITA AL USUARIO ES SU EMAIL 
+                            Y SU DNI COMO PASSWORD-->
+
                             <form class="widget_loginform" action="login.php" method="post" onsubmit="return loginUsuario()">
                                 <div id="login_form_widget" class="mod-buttons fieldset login_form login_form_widget">
                                     <label id="login_widget" for="ilogin_widget" class="login login_widget">
@@ -51,28 +65,25 @@
                                     <label id="enviar_login_widget" for="submit_login_widget" class="enviar_login enviar_login_widget">
                                         <input src="img/transp.gif" alt="enviar datos de identificación" name="submit" id="submit_login_widget" class="image-enviar" type="image" />
                                     </label>
-                                    <!--<span id="login_error_widget"> </span>-->
                                 </div>
                             </form>
                         </div>
 
+                        <!--div donde se aloja el contenido-->
                         <div id="pagina">
                             <h1 id="titulo_pagina"><span class="texto_titulo">Inicio</span></h1>
                             <div id="contenido" class="sec_interior">
                                 <div class="content_doku" style="text-align:center">
+
+                                    <!--Conexion a la BD donde realizamos una consulta para sacar-->
+                                    <!--las colas disponibles a las que un usuario puede apuntarse-->
+                                    <!--Para ello el usuario debe hacer click encima de cualquier cola-->
+                                    <!--y será redirigido a otra pagina donde vera la informacion de dicha cola.-->
+                                    <!--Si hay colas disponibles se mostrarán en una tabla.--> 
+                                    <!--En el caso de que no haya se mostrará un mensaje al usuario.-->
                                     <?php
-                                    $servername = "localhost";
-                                    $username = "root";
-                                    $password = "root";
-                                    $dbname = "gestor_turnos";
-                                    // Create connection
-                                    $conn = mysqli_connect($servername, $username, $password, $dbname);
-                                    // Check connection
-                                    if (!$conn) {
-                                        die("Connection failed: " . mysqli_connect_error());
-                                    }
                                     $sql = "SELECT * FROM `revisiones` order by `Fecha`";
-                                    $result = $conn->query($sql);
+                                    $result = conexion()->query($sql);
                                     if ($result->num_rows > 0) {
                                         ?>
                                         <table class="sec_interior " style="width: 99%">
@@ -84,6 +95,7 @@
                                                     <?php while ($row = mysqli_fetch_array($result)) { ?>
                                                     </tr>
                                                     <tr>
+                                                        <!--Redireccion a InfoColas enviando el codigo de la cola en la URL-->
                                                         <td> <a href="InfoColas.php?codigo=<?php echo $row['codigo_revision'] ?>"><?php echo $row['Asignatura'] ?> </a> </td>
                                                         <td> <a href="InfoColas.php?codigo=<?php echo $row['codigo_revision'] ?>"> <?php echo $row['Fecha'] ?> </a> </td>
                                                         <td> <a href="InfoColas.php?codigo=<?php echo $row['codigo_revision'] ?>"> <?php echo $row['Hora'] ?> </a></td>
@@ -92,25 +104,21 @@
                                         </table>
                                         <?php
                                     } else {
-                                        echo "0 results";
+                                        echo "No hay colas disponibles en este momento.";
                                     }
-                                    $conn->close();
+                                    ?>
+
+                                    <!--Cierre de la conexión con la BD-->
+                                    <?php
+                                    conexion()->close();
                                     ?>                      
                                     </tbody>    
-
-
-
                                 </div>
                             </div>
                         </div>
-
                     </div>
-                    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
-                    <script type="text/javascript">_uacct = "UA-2290740-1";urchinTracker();</script>
-
                     <div id="interior_pie">
-                        <div id="pie">
-                        </div>
+                        <div id="pie"></div>
                     </div>
                 </div>
             </div>

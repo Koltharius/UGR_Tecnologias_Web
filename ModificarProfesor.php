@@ -1,6 +1,8 @@
 <?php
 session_start();
+require './ConexionBD.php';
 
+//Compruebo que el usuario esta logueado y que su sesion no ha expirado y que su rol es de administrador
 if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == true && $_SESSION['Rol'] === 'profesor') {
     
 } else {
@@ -16,6 +18,7 @@ if ($now > $_SESSION['expire']) {
     exit;
 }
 ?>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es" >
     <head>
@@ -31,7 +34,7 @@ if ($now > $_SESSION['expire']) {
         <link rel="icon" href="decsai.ico" type="image/vnd.microsoft.icon" />
         <link rel="stylesheet" id="css-style" type="text/css" href="css/style-gestionTurnos.css" media="all" />
         <link href="css/style_dock.css" rel="stylesheet" type="text/css" />
-        <script type="text/javascript" src="js/funciones.js"></script>            
+        <script type="text/javascript" src="js/ejercicio.js"></script>            
     </head>
     <body>
         <div id="contenedor_margenes" class="">
@@ -45,21 +48,27 @@ if ($now > $_SESSION['expire']) {
                         <span class="separador_enlaces"> | </span>
                     </div>
                 </div>
-                                                <div style="width: 100%; text-align: right; margin: 0px auto 0px auto;">
+                <div style="width: 100%; text-align: right; margin: 0px auto 0px auto;">
                     <table align="center" style="width:100%; border:none; border-collapse: none; background-color:none; background: none;" class="tabla_menu">
                         <tbody>
                             <tr>
                                 <td width="75%" align="left">
 
-                                    <td style="text-align: right;"><b>Usuario:</b> <?php echo $_SESSION['nombre'] ?><br><img width="10px" height="10px" src="img/cerrar.png" alt="Cerrar Sesión">&nbsp;<a href="CerrarSesion.php">Cerrar Sesión</a><br>
-                                                    </td>
-                                                    </tr>
-                                                    </tbody>
-                                                    </table>
-                                                    </div>
+                                    <td style="text-align: right;"><b>Usuario:</b> <?php echo $_SESSION['nombre'] ?><br/>
+                                        <img width="10px" height="10px" src="img/cerrar.png" alt="Cerrar Sesión">&nbsp;</img>
+                                        <a href="CerrarSesion.php">Cerrar Sesión</a><br/>
+                                    </td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 <div>
                     <div id="general">
                         <div id="enlaces_secciones" class="mod-menu_secciones">
+
+                            <!--Menus Lateral-->
+
                             <div id="menus">
                                 <ul>
                                     <li class="tipo2 item-first_level"><a href="PaginaProfesor.php">Inicio</a></li>  
@@ -69,27 +78,23 @@ if ($now > $_SESSION['expire']) {
                                             <a href="ModificarProfesor.php?email=0" target="_self" id="enlace_modificar1">Modificar mis datos</a></li>
                                     </ul>
                                     <li class="tipo2 item-first_level"><a href="GestionColasProfesor.php">Gestionar mis colas</a></li>
-                                    <li class="tipo2 item-first_level"><a href="GestionTurnos.php">Gesti&oacute;n de Turnos</a></li>
                                     <li class="tipo2 item-first_level"><a href="CrearAviso.php">Crear aviso</a></li>
                                     <li class="tipo2 item-first_level"><a href="CerrarSesion.php">Cerrar Sesi&oacute;n</a></li>
                                 </ul>
                             </div>
                         </div>
+
                         <div id="pagina">
                             <h1 id="titulo_pagina"><span class="texto_titulo">Modificar profesor</span></h1>
                             <div style="text-align:center">
+
+                                <!--Se recogen los datos del formulario y se 
+                                actualizan en la base de datos. 
+                                Si se ha indicado alguna contraseña esta se 
+                                modificara, en caso de no indicar ninguna se 
+                                guardara la que tenga ese usuario.-->
                                 <?php
-                                $servername = "localhost";
-                                $username = "root";
-                                $password = "root";
-                                $dbname = "gestor_turnos";
                                 $emailRecibido = (isset($_GET['email'])) ? $_GET['email'] : " ";
-                                // Create connection
-                                $con = new mysqli($servername, $username, $password, $dbname);
-                                // Check connection
-                                if ($con->connect_error) {
-                                    die("Connection failed: " . $con->connect_error);
-                                }
                                 $email = $nombre = $apellidos = $dni = $psw = "";
 
                                 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -103,7 +108,7 @@ if ($now > $_SESSION['expire']) {
                                         $sql = "UPDATE `usuarios` SET Nombre='$nombre', Apellidos='$apellidos', Email='$email', Rol='$rol' where Email='$email'";
                                     else
                                         $sql = "UPDATE `usuarios` SET Nombre='$nombre', Apellidos='$apellidos', Email='$email',  Password=md5('$psw'), Rol='$rol' where Email='$email'";
-                                    if ($con->query($sql) === TRUE) {
+                                    if (conexion()->query($sql) === TRUE) {
                                         ?>
 
                                         <script>
@@ -121,8 +126,10 @@ if ($now > $_SESSION['expire']) {
                                     }
                                 } else {
                                     $sql = "SELECT * FROM `usuarios` where Email='$emailRecibido'";
-                                    $result = mysqli_query($con, $sql);
+                                    $result = mysqli_query(conexion(), $sql);
                                 }
+
+                                //Formulario en el cual se modificaran los datos del usuario seleccionado
 
                                 if ($result->num_rows > 0) {
                                     while ($row = mysqli_fetch_array($result)) {
@@ -161,7 +168,8 @@ if ($now > $_SESSION['expire']) {
                                                                         <td colspan="2" style="text-align:center;"><input name="enviar" value="Modificar" class="submit" type="submit" ></td>
                                                                     </tr>
 
-                                                                </tbody></table>
+                                                                </tbody>
+                                                            </table>
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -172,7 +180,8 @@ if ($now > $_SESSION['expire']) {
                                 } else {
                                     
                                 }
-                                mysqli_close($con);
+                                //Cierre de la conexion de la BD
+                                mysqli_close(conexion());
                                 ?>
                             </div>
                         </div>

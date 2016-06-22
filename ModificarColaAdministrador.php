@@ -1,21 +1,24 @@
 <?php
-	session_start();
-        //echo $_SESSION['username']=$_SESSION['email']; 
-        
-	if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == true && $_SESSION['Rol'] === 'administrador') {
-	} else {
-	   echo "<script>alert('Esta página es solo para administradores'); window.location.href='index.php';</script>";
-	exit;
-	}
-	
-	$now = time();
-	 
-	if($now > $_SESSION['expire']) {
-	session_destroy();
-	echo "<script>alert('Su sesion ha terminado'); window.location.href='index.php';</script>";
-	exit;
-	}
-	?>
+session_start();
+require './ConexionBD.php';
+
+//Compruebo que el usuario esta logueado y que su sesion no ha expirado y que su rol es de administrador
+if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == true && $_SESSION['Rol'] === 'administrador') {
+    
+} else {
+    echo "<script>alert('Esta página es solo para administradores'); window.location.href='index.php';</script>";
+    exit;
+}
+
+$now = time();
+
+if ($now > $_SESSION['expire']) {
+    session_destroy();
+    echo "<script>alert('Su sesion ha terminado'); window.location.href='index.php';</script>";
+    exit;
+}
+?>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es" >
     <head>
@@ -31,7 +34,7 @@
         <link rel="icon" href="decsai.ico" type="image/vnd.microsoft.icon" />
         <link rel="stylesheet" id="css-style" type="text/css" href="css/style-gestionTurnos.css" media="all" />
         <link href="css/style_dock.css" rel="stylesheet" type="text/css" />
-        <script type="text/javascript" src="js/funciones.js"></script>
+        <script type="text/javascript" src="js/ejercicio.js"></script>
     </head>
     <body>
         <div id="contenedor_margenes" class="">
@@ -46,19 +49,25 @@
                     </div>
                 </div>
                 <div style="width: 100%; text-align: right; margin: 0px auto 0px auto;">
-      <table align="center" style="width:100%; border:none; border-collapse: none; background-color:none; background: none;" class="tabla_menu">
-        <tbody>
-          <tr>
-            <td width="75%" align="left">
-            
-                <td style="text-align: right;"><b>Usuario:</b> <?php  echo $_SESSION['nombre'] ?><br><img width="10px" height="10px" src="img/cerrar.png" alt="Cerrar Sesión">&nbsp;<a href="CerrarSesion.php">Cerrar Sesión</a><br>
-	      	    </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+                    <table align="center" style="width:100%; border:none; border-collapse: none; background-color:none; background: none;" class="tabla_menu">
+                        <tbody>
+                            <tr>
+                                <td width="75%" align="left">
+                                    <td style="text-align: right;">
+                                        <b>Usuario:</b> <?php echo $_SESSION['nombre'] ?><br/>
+                                        <img width="10px" height="10px" src="img/cerrar.png" alt="Cerrar Sesión">&nbsp;</img>
+                                        <a href="CerrarSesion.php">Cerrar Sesión</a><br/>
+                                    </td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 <div>
                     <div id="general">
+                        
+                        <!--Menus lateral-->
+                        
                         <div id="menus">
                             <div id="enlaces_secciones" class="mod-menu_secciones">
                                 <ul>
@@ -79,28 +88,20 @@
                         <div id="pagina">
                             <h1 id="titulo_pagina"><span class="texto_titulo">Modificar revisión</span></h1>
                             <div style="text-align:center">
+
+                                <!--Se recogen los datos introducidos en el
+                                formulario y se actualizan en la cola correspondiente
+                                en la base de datos.-->
                                 <?php
-                                $servername = "localhost";
-                                $username = "root";
-                                $password = "root";
-                                $dbname = "gestor_turnos";
                                 $codigoRecibido = (isset($_GET['codigo'])) ? $_GET['codigo'] : " ";
-                                // Create connection
-                                $con = new mysqli($servername, $username, $password, $dbname);
-                                // Check connection
-                                if ($con->connect_error) {
-                                    die("Connection failed: " . $con->connect_error);
-                                }
                                 $email = $nombre = $apellidos = $dni = "";
-
                                 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
                                     $codigo = $_POST['codigo'];
                                     $lugar = $_POST['lugarDeRevision'];
                                     $fecha = $_POST['fechaRevision'];
                                     $hora = $_POST['horaRevision'];
                                     $sql = "UPDATE `revisiones` SET   Lugar='$lugar', Fecha='$fecha', Hora='$hora' where codigo_revision='$codigo'";
-                                    if ($con->query($sql) === TRUE) {
+                                    if (conexion()->query($sql) === TRUE) {
                                         ?>
 
                                         <script>
@@ -112,17 +113,18 @@
                                         ?>
                                         <script>
                                             alert("Los datos introducidos son erronesos:\n"
-                                                    +"\tEl formato de la fecha es: YYYY-MM-DD\n"
-                                                    +"\tEl formato de la hora es: HH-MM-SS\n");
+                                                    + "\tEl formato de la fecha es: YYYY-MM-DD\n"
+                                                    + "\tEl formato de la hora es: HH-MM-SS\n");
                                             window.location = "GestionColasAdministrador.php";
                                         </script>
                                         <?php
                                     }
                                 } else {
                                     $sql = "SELECT * FROM `revisiones` where codigo_revision='$codigoRecibido'";
-                                    $result = mysqli_query($con, $sql);
+                                    $result = mysqli_query(conexion(), $sql);
                                 }
 
+                                //Formulario en el cual se modificaran los datos de la cola seleccionada
                                 if ($result->num_rows > 0) {
                                     while ($row = mysqli_fetch_array($result)) {
                                         ?>
@@ -135,7 +137,6 @@
                                                         <td> 
                                                             <table class="formulario-datos"  cellpadding="9" cellspacing="6" align="center" >
                                                                 <tbody>
-
                                                                     <tr>
                                                                         <td style="text-align: right;"> Codigo: </td>
                                                                         <td> <input type="text" name="codigo" value="<?php echo $row['codigo_revision'] ?>" readonly="readonly"/><br></td>
@@ -159,8 +160,8 @@
                                                                     <tr> 
                                                                         <td colspan="2" style="text-align:center;"><input name="enviar" value="Modificar" class="submit" type="submit" ></td>
                                                                     </tr>
-
-                                                                </tbody></table>
+                                                                </tbody>
+                                                            </table>
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -171,12 +172,13 @@
                                 } else {
                                     
                                 }
-                                mysqli_close($con);
+                                // Cierre de la conexion con la BD
+                                mysqli_close(conexion());
                                 ?>
                             </div>
                         </div>
                     </div>
-                                <div id="interior_pie">
+                    <div id="interior_pie">
                         <div id="pie">
                         </div>
                     </div>

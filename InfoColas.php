@@ -1,4 +1,7 @@
-<?php session_start(); ?>
+<?php
+require './ConexionBD.php';
+session_start();
+?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es" >
@@ -31,31 +34,33 @@
                 <div>
                     <div id="general">
                         <div id="menus">
+
+                            <!--Menu Lateral-->
+
                             <div id="enlaces_secciones" class="mod-menu_secciones">
                                 <ul>
-                                    <li class="tipo2 item-first_level"><a href="index.php">Inicio</a></li>  
+                                    <li class="tipo2 item-first_level"><a href="index.php">Inicio</a></li>
                                     <li class="tipo2 item-first_level"><a href="UnirseACola.php">Unirse a Cola</a></li>
                                     <li class="tipo2 item-first_level"><a href="PosicionCola.php">Ver Posici&oacute;n</a></li>
                                 </ul>
                             </div>
                         </div>
+
+                        <!--div donde se aloja el contenido-->
                         <div id="pagina">
                             <h1 id="titulo_pagina"><span class="texto_titulo">Información Cola</span></h1>
                             <div id="contenido" class="sec_interior">
                                 <div class="content_doku" style="text-align:center">
+
+
+                                    <!--Mostramos toda la información de la cola seleccionada por el alumno-->
+                                    <!--almacenada en la base de datos, dando la opción de que--> 
+                                    <!--el usuario se una a ella o acceda a ella para ver su posicion-->
+                                    <!--en caso de que ya este inscrito en ella.-->
+
                                     <?php
-                                    $servername = "localhost";
-                                    $username = "root";
-                                    $password = "root";
-                                    $dbname = "gestor_turnos";
-                                    // Create connection
-                                    $conn = mysqli_connect($servername, $username, $password, $dbname);
-                                    // Check connection
-                                    if (!$conn) {
-                                        die("Connection failed: " . mysqli_connect_error());
-                                    }
                                     $sql = "SELECT * FROM `revisiones` where codigo_revision='$_GET[codigo]'";
-                                    $result = $conn->query($sql);
+                                    $result = conexion()->query($sql);
 
                                     if ($result->num_rows > 0) {
                                         ?>
@@ -80,19 +85,22 @@
                                                         <td> <?php echo $row['Hora'] ?> </td>
                                                         <td> <?php echo $row['Lugar'] ?> </td>
                                                     </tr>
-                                        <?php } ?>
+                                                <?php } ?>
                                         </table>
                                         <?php
                                     } else {
                                         echo "0 results";
                                     }
-                                    $conn->close();
+                                    ?>
+                                    
+                                    <!--Cierre de la conexión con la BD-->
+                                    <?php
+                                    conexion()->close();
                                     ?>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                     <div id="interior_pie">
                         <div id="pie"></div>
                     </div>
